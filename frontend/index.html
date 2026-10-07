@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Office Agent</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <!-- 左侧菜单 -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            <h2>AI Office</h2>
+            <p>智能办公助手</p>
+        </div>
+
+        <nav class="menu">
+
+            <button
+                class="menu-item active"
+                data-page="chat"
+                onclick="switchPage('chat', this)">
+                🤖 AI 办公助手
+            </button>
+
+            <button
+                class="menu-item"
+                data-page="customers"
+                onclick="switchPage('customers', this)">
+                👥 客户管理
+            </button>
+
+            <button
+                class="menu-item"
+                data-page="todos"
+                onclick="switchPage('todos', this)">
+                ✅ 待办事项
+            </button>
+
+            <button
+                class="menu-item"
+                data-page="knowledge"
+                onclick="switchPage('knowledge', this)">
+                📚 知识库
+            </button>
+
+            <button
+                class="menu-item"
+                data-page="logs"
+                onclick="switchPage('logs', this)">
+                📋 任务记录
+            </button>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+            <button class="logout-button" onclick="logout()">
+                退出登录
+            </button>
+        </div>
+
+    </aside>
+
+
+    <!-- 右侧主体 -->
+    <main class="main-content">
+
+        <!-- AI聊天 -->
+        <section id="chatPage" class="page active-page">
+
+            <div class="page-header">
+                <div>
+                    <h1>AI 办公助手</h1>
+                    <p>通过自然语言完成客户查询、待办管理和知识库问答</p>
+                </div>
+            </div>
+
+            <div class="chat-container" id="chatContainer">
+
+                <div class="welcome" id="welcome">
+
+                    <h2>你好，我是 AI 办公助手 👋</h2>
+
+                    <p>你可以直接告诉我需要完成什么办公任务。</p>
+
+                    <div class="example-grid">
+
+                        <button onclick="useExample('查询待跟进客户')">
+                            查询待跟进客户
+                        </button>
+
+                        <button onclick="useExample('创建待办，明天联系张三')">
+                            创建待办
+                        </button>
+
+                        <button onclick="useExample('查询我的未完成待办')">
+                            查询待办
+                        </button>
+
+                        <button onclick="useExample('客户连续3次没有回复应该怎么办？')">
+                            查询公司规定
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div id="messages" class="messages"></div>
+
+            </div>
+
+            <div class="chat-input-area">
+
+                <textarea
+                    id="messageInput"
+                    placeholder="输入你的任务，例如：查询待跟进客户"
+                    rows="2"></textarea>
+
+                <button id="sendButton" onclick="sendMessage()">
+                    发送
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- 客户管理 -->
+        <section id="customersPage" class="page">
+
+            <div class="page-header">
+                <div>
+                    <h1>客户管理</h1>
+                    <p>查看当前系统中的客户信息和跟进状态</p>
+                </div>
+
+                <button class="refresh-button" onclick="loadCustomers()">
+                    刷新
+                </button>
+            </div>
+
+            <div class="card">
+
+                <div id="customersLoading" class="loading">
+                    正在加载客户数据...
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table id="customersTable" class="data-table">
+
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>客户姓名</th>
+                            <th>公司</th>
+                            <th>联系电话</th>
+                            <th>跟进状态</th>
+                            <th>创建时间</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="customersBody"></tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- 待办事项 -->
+        <section id="todosPage" class="page">
+
+            <div class="page-header">
+
+                <div>
+                    <h1>待办事项</h1>
+                    <p>查看当前登录账号的个人待办</p>
+                </div>
+
+                <button class="refresh-button" onclick="loadTodos()">
+                    刷新
+                </button>
+
+            </div>
+
+            <div id="todosLoading" class="loading">
+                正在加载待办...
+            </div>
+
+            <div id="todoList" class="todo-list"></div>
+
+        </section>
+
+
+        <!-- 知识库 -->
+        <section id="knowledgePage" class="page">
+
+            <div class="page-header">
+
+                <div>
+                    <h1>企业知识库</h1>
+                    <p>基于 RAG 检索公司业务规范</p>
+                </div>
+
+            </div>
+
+            <div class="knowledge-layout">
+
+                <div class="card">
+
+                    <h3>📚 当前知识库</h3>
+
+                    <p>
+                        当前已接入公司客户跟进管理规范，
+                        系统使用 Embedding + Chroma
+                        进行向量检索。
+                    </p>
+
+                    <div class="knowledge-tags">
+                        <span>客户跟进</span>
+                        <span>客户状态</span>
+                        <span>业务规范</span>
+                        <span>信息安全</span>
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <h3>🤖 RAG 知识问答</h3>
+
+                    <p class="small-text">
+                        输入公司规定相关问题，AI 会从知识库检索相关内容后回答。
+                    </p>
+
+                    <textarea
+                        id="knowledgeInput"
+                        class="knowledge-input"
+                        placeholder="例如：新客户多久需要第一次跟进？"></textarea>
+
+                    <button
+                        id="knowledgeButton"
+                        class="primary-button"
+                        onclick="askKnowledge()">
+                        查询知识库
+                    </button>
+
+                    <div
+                        id="knowledgeAnswer"
+                        class="knowledge-answer">
+                        查询结果会显示在这里。
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- 任务记录 -->
+        <section id="logsPage" class="page">
+
+            <div class="page-header">
+
+                <div>
+                    <h1>任务记录</h1>
+                    <p>查看 AI Agent 的历史执行记录</p>
+                </div>
+
+                <button class="refresh-button" onclick="loadTaskLogs()">
+                    刷新
+                </button>
+
+            </div>
+
+            <div id="logsLoading" class="loading">
+                正在加载任务记录...
+            </div>
+
+            <div id="taskLogList" class="task-log-list"></div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
